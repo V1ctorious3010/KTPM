@@ -1,0 +1,25 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Cài SSH và các tiện ích cơ bản
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssh-server sudo locales ca-certificates curl vim \
+ && rm -rf /var/lib/apt/lists/*
+
+# Tạo user thường
+ARG USERNAME=student
+ARG USERPASS=student
+RUN useradd -m -s /bin/bash $USERNAME \
+ && echo "$USERNAME:$USERPASS" | chpasswd \
+ && usermod -aG sudo $USERNAME
+
+# Cấu hình SSH
+RUN mkdir -p /var/run/sshd
+RUN sed -ri 's/^#?PasswordAuthentication .*/PasswordAuthentication yes/' /etc/ssh/sshd_config \
+ && sed -ri 's/^#?PermitRootLogin .*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+
+EXPOSE 22
+EXPOSE 5901
+
+CMD ["/usr/sbin/sshd","-D"]

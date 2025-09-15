@@ -1,0 +1,17 @@
+services:
+  deskbox:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USERNAME: student
+        USERPASS: student
+    container_name: deskbox
+    ports:
+      - "2222:22"     # SSH
+      - "5901:5901"   # VNC
+    volumes:
+      - deskbox-home:/home/student
+    restart: unless-stopped
+volumes:
+  deskbox-home:
